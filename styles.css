@@ -98,6 +98,20 @@ h2 {
   gap: 10px;
 }
 
+.icon-button {
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  border-radius: 50%;
+  font-weight: 760;
+}
+
+.icon-button[aria-expanded="true"] {
+  border-color: #245844;
+  color: #245844;
+  background: #eef4ef;
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -134,39 +148,12 @@ h2 {
   margin-bottom: 18px;
   border: 1px solid #c7d1c8;
   border-radius: 8px;
+  padding: 14px 16px;
   background: #eef4ef;
-  overflow: hidden;
-}
-
-.connection-note summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 12px 16px;
-  font-weight: 760;
-  cursor: pointer;
-  list-style: none;
-}
-
-.connection-note summary::-webkit-details-marker {
-  display: none;
-}
-
-.connection-note summary::after {
-  content: "+";
-  color: #607068;
-  font-size: 1.25rem;
-  line-height: 1;
-}
-
-.connection-note[open] summary::after {
-  content: "-";
 }
 
 .connection-note p {
-  border-top: 1px solid #c7d1c8;
-  padding: 12px 16px 14px;
+  margin-top: 6px;
   color: #405249;
 }
 
@@ -330,7 +317,7 @@ label {
   }
 
   .connection-actions {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 44px 1fr 1fr;
   }
 
   .status-grid {
@@ -340,11 +327,7 @@ label {
 
   .connection-note {
     margin-bottom: 12px;
-  }
-
-  .connection-note summary {
-    min-height: 44px;
-    padding: 10px 12px;
+    padding: 12px;
   }
 
   .metric {
@@ -421,6 +404,12 @@ label {
 
   button.primary:hover:not(:disabled) {
     background: #3e755d;
+  }
+
+  .icon-button[aria-expanded="true"] {
+    border-color: #4d8d70;
+    color: #b9e5c6;
+    background: #1f3327;
   }
 
   .status-message.error {

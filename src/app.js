@@ -405,6 +405,8 @@ class LinakDesk {
 }
 
 const elements = {
+  pairingHelpButton: document.querySelector('#pairingHelpButton'),
+  pairingHelp: document.querySelector('#pairingHelp'),
   connectButton: document.querySelector('#connectButton'),
   disconnectButton: document.querySelector('#disconnectButton'),
   deviceName: document.querySelector('#deviceName'),
@@ -447,6 +449,12 @@ elements.commandPeriod.value = String(storage.commandPeriod);
 elements.baseHeightValue.textContent = String(storage.baseHeight);
 renderPresets();
 setConnected(false);
+
+elements.pairingHelpButton.addEventListener('click', () => {
+  const expanded = elements.pairingHelpButton.getAttribute('aria-expanded') === 'true';
+  elements.pairingHelpButton.setAttribute('aria-expanded', String(!expanded));
+  elements.pairingHelp.hidden = expanded;
+});
 
 elements.connectButton.addEventListener('click', async () => {
   try {

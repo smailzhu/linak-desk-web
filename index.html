@@ -15,6 +15,7 @@
           <p id="deviceName">No desk connected</p>
         </div>
         <div class="connection-actions">
+          <button id="pairingHelpButton" class="icon-button" type="button" aria-controls="pairingHelp" aria-expanded="false" aria-label="Pairing help" title="Pairing help">?</button>
           <button id="connectButton" class="primary">Connect</button>
           <button id="disconnectButton" disabled>Disconnect</button>
         </div>
@@ -22,10 +23,10 @@
 
       <output id="statusMessage" class="status-message" role="status" aria-live="polite"></output>
 
-      <details class="connection-note">
-        <summary>Pairing help</summary>
+      <section id="pairingHelp" class="connection-note" aria-label="Pairing help" hidden>
+        <h2>Pairing help</h2>
         <p>Put the desk in Bluetooth pairing mode before connecting. When the browser or system Bluetooth dialog opens, select the desk and choose Pair or Connect.</p>
-      </details>
+      </section>
 
       <section class="status-grid" aria-label="Desk status">
         <div class="metric">
