@@ -104,6 +104,32 @@ h2 {
   gap: 12px;
 }
 
+.status-message {
+  display: block;
+  margin-bottom: 18px;
+  border: 1px solid #c9d4ce;
+  border-radius: 8px;
+  padding: 12px 14px;
+  color: #203228;
+  background: #ffffff;
+}
+
+.status-message:empty {
+  display: none;
+}
+
+.status-message.error {
+  border-color: #c77f7f;
+  color: #7d2020;
+  background: #fff1f1;
+}
+
+.status-message.success {
+  border-color: #95b9a1;
+  color: #1d5732;
+  background: #edf8f0;
+}
+
 .connection-note {
   display: grid;
   gap: 6px;
@@ -307,6 +333,7 @@ label {
 
   button,
   .input-row input,
+  .status-message,
   .connection-note,
   .metric,
   .hold-controls,
@@ -330,6 +357,18 @@ label {
 
   button.primary:hover:not(:disabled) {
     background: #3e755d;
+  }
+
+  .status-message.error {
+    border-color: #825050;
+    color: #f1b0b0;
+    background: #341f1f;
+  }
+
+  .status-message.success {
+    border-color: #557962;
+    color: #b9e5c6;
+    background: #1f3327;
   }
 
   #deviceName,

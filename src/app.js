@@ -330,6 +330,7 @@ const elements = {
   presetTemplate: document.querySelector('#presetTemplate'),
   baseHeight: document.querySelector('#baseHeight'),
   commandPeriod: document.querySelector('#commandPeriod'),
+  statusMessage: document.querySelector('#statusMessage'),
   log: document.querySelector('#log'),
 };
 
@@ -358,13 +359,14 @@ setConnected(false);
 elements.connectButton.addEventListener('click', async () => {
   try {
     setBusy(true);
+    log('Opening Bluetooth picker.');
     const device = await desk.connect();
     elements.deviceName.textContent = device.name || 'LINAK desk';
     setConnected(true);
-    log('Connected.');
+    log('Connected.', 'success');
   } catch (error) {
     setConnected(false);
-    log(error.message);
+    log(`Connection error: ${formatConnectionError(error)}`, 'error');
   } finally {
     setBusy(false);
   }
@@ -435,9 +437,9 @@ async function moveTo(height) {
     setBusy(true);
     log(`Moving to ${height} mm.`);
     const reading = await desk.moveTo(height);
-    log(`Height ${reading.height} mm.`);
+    log(`Height ${reading.height} mm.`, 'success');
   } catch (error) {
-    log(error.message);
+    log(error.message, 'error');
   } finally {
     setBusy(false);
   }
@@ -512,8 +514,14 @@ function setBusy(busy) {
   elements.savePresetButton.disabled = busy || !desk.isConnected();
 }
 
-function log(message) {
+function log(message, type = 'info') {
+  elements.statusMessage.className = `status-message ${type === 'info' ? '' : type}`.trim();
+  elements.statusMessage.textContent = message;
   elements.log.textContent = message;
+}
+
+function formatConnectionError(error) {
+  return String(error?.message || error).replace(/^connection error:\s*/i, '');
 }
 
 function delay(ms) {
