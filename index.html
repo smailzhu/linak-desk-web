@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <title>LINAK Desk Web</title>
+    <link rel="stylesheet" href="./styles.css">
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <div>
+          <h1>LINAK Desk</h1>
+          <p id="deviceName">No desk connected</p>
+        </div>
+        <div class="connection-actions">
+          <button id="connectButton" class="primary">Connect</button>
+          <button id="disconnectButton" disabled>Disconnect</button>
+        </div>
+      </header>
+
+      <section class="status-grid" aria-label="Desk status">
+        <div class="metric">
+          <span>Height</span>
+          <strong id="heightValue">--</strong>
+          <small>mm</small>
+        </div>
+        <div class="metric">
+          <span>Speed</span>
+          <strong id="speedValue">--</strong>
+          <small>mm/s</small>
+        </div>
+        <div class="metric">
+          <span>Base</span>
+          <strong id="baseHeightValue">620</strong>
+          <small>mm</small>
+        </div>
+      </section>
+
+      <section class="controls" aria-label="Desk controls">
+        <div class="hold-controls">
+          <button id="upButton" class="move-button" disabled aria-label="Move up">
+            <span aria-hidden="true">↑</span>
+          </button>
+          <button id="stopButton" class="stop-button" disabled>Stop</button>
+          <button id="downButton" class="move-button" disabled aria-label="Move down">
+            <span aria-hidden="true">↓</span>
+          </button>
+        </div>
+
+        <form id="moveForm" class="move-form">
+          <label for="targetHeight">Target height</label>
+          <div class="input-row">
+            <input id="targetHeight" name="targetHeight" type="number" min="620" max="1270" step="1" value="760" disabled>
+            <span>mm</span>
+            <button id="moveButton" class="primary" type="submit" disabled>Move</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="presets" aria-label="Height presets">
+        <div class="section-heading">
+          <h2>Presets</h2>
+          <button id="savePresetButton" disabled>Save Current</button>
+        </div>
+        <div id="presetList" class="preset-list"></div>
+      </section>
+
+      <section class="settings" aria-label="Desk settings">
+        <div class="field">
+          <label for="baseHeight">Base height</label>
+          <div class="input-row">
+            <input id="baseHeight" type="number" min="500" max="900" step="1" value="620">
+            <span>mm</span>
+          </div>
+        </div>
+        <div class="field">
+          <label for="commandPeriod">Command period</label>
+          <div class="input-row">
+            <input id="commandPeriod" type="number" min="150" max="1000" step="50" value="400">
+            <span>ms</span>
+          </div>
+        </div>
+      </section>
+
+      <output id="log" class="log" aria-live="polite"></output>
+    </main>
+
+    <template id="presetTemplate">
+      <div class="preset">
+        <button class="preset-move" type="button"></button>
+        <button class="preset-delete" type="button" aria-label="Delete preset">×</button>
+      </div>
+    </template>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
