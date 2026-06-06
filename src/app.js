@@ -59,6 +59,7 @@ class LinakDesk {
   dpgNotificationsStarted = false;
   heightNotificationsStarted = false;
   disconnecting = false;
+  connectWarnings = [];
   lastReading = null;
   onDisconnect = () => {};
   onReading = () => {};
@@ -91,16 +92,17 @@ class LinakDesk {
     this.dpgNotificationsStarted = false;
     this.heightNotificationsStarted = false;
     this.disconnecting = false;
+    this.connectWarnings = [];
 
     try {
       this.server = await this.withConnectStep('connecting to GATT server', () => this.device.gatt.connect());
       await delay(250);
       await this.loadCharacteristics();
-      await this.startHeightNotifications().catch((error) => {
-        this.onLog(`Live updates unavailable: ${error.message}`);
-      });
       await this.initialiseDpg();
-      await this.withConnectStep('reading height', () => this.refreshHeight());
+      await this.tryRefreshHeight();
+      await this.startHeightNotifications().catch((error) => {
+        this.addConnectWarning(`Live updates unavailable: ${error.message}`);
+      });
     } catch (error) {
       if (this.device.gatt.connected) {
         this.disconnecting = true;
@@ -120,6 +122,11 @@ class LinakDesk {
       this.disconnecting = true;
       this.device.gatt.disconnect();
     }
+  }
+
+  addConnectWarning(message) {
+    this.connectWarnings.push(message);
+    this.onLog(message);
   }
 
   isConnected() {
@@ -272,10 +279,36 @@ class LinakDesk {
   }
 
   async refreshHeight() {
-    const value = await this.chars.referenceOutputOne.readValue();
-    const reading = this.decodeHeightSpeed(value);
-    this.publishReading(reading);
-    return reading;
+    return this.retryGatt('reading height', async () => {
+      const value = await this.chars.referenceOutputOne.readValue();
+      const reading = this.decodeHeightSpeed(value);
+      this.publishReading(reading);
+      return reading;
+    });
+  }
+
+  async tryRefreshHeight() {
+    try {
+      return await this.refreshHeight();
+    } catch (error) {
+      this.addConnectWarning(`Connected, but ${error.message}`);
+      return null;
+    }
+  }
+
+  async retryGatt(label, operation, attempts = 3) {
+    let lastError = null;
+    for (let index = 0; index < attempts; index += 1) {
+      try {
+        return await operation();
+      } catch (error) {
+        lastError = error;
+        if (index < attempts - 1) {
+          await delay(200 + index * 200);
+        }
+      }
+    }
+    throw new Error(`${label} failed: ${lastError?.message || lastError}`);
   }
 
   decodeHeightSpeed(value) {
@@ -422,7 +455,11 @@ elements.connectButton.addEventListener('click', async () => {
     const device = await desk.connect();
     elements.deviceName.textContent = device.name || 'LINAK desk';
     setConnected(true);
-    log('Connected.', 'success');
+    if (desk.connectWarnings.length) {
+      log(`Connected. ${desk.connectWarnings.at(-1)}`);
+    } else {
+      log('Connected.', 'success');
+    }
   } catch (error) {
     setConnected(false);
     log(`Connection error: ${formatConnectionError(error)}`, 'error');
