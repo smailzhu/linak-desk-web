@@ -131,16 +131,42 @@ h2 {
 }
 
 .connection-note {
-  display: grid;
-  gap: 6px;
   margin-bottom: 18px;
   border: 1px solid #c7d1c8;
   border-radius: 8px;
-  padding: 14px 16px;
   background: #eef4ef;
+  overflow: hidden;
+}
+
+.connection-note summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  font-weight: 760;
+  cursor: pointer;
+  list-style: none;
+}
+
+.connection-note summary::-webkit-details-marker {
+  display: none;
+}
+
+.connection-note summary::after {
+  content: "+";
+  color: #607068;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.connection-note[open] summary::after {
+  content: "-";
 }
 
 .connection-note p {
+  border-top: 1px solid #c7d1c8;
+  padding: 12px 16px 14px;
   color: #405249;
 }
 
@@ -283,7 +309,16 @@ label {
 @media (max-width: 760px) {
   .app-shell {
     width: min(100% - 24px, 560px);
-    padding-top: 18px;
+    padding-top: 14px;
+  }
+
+  .topbar {
+    gap: 10px;
+    padding: 8px 0 12px;
+  }
+
+  h1 {
+    font-size: 2rem;
   }
 
   .topbar,
@@ -299,23 +334,52 @@ label {
   }
 
   .status-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .connection-note {
+    margin-bottom: 12px;
+  }
+
+  .connection-note summary {
+    min-height: 44px;
+    padding: 10px 12px;
   }
 
   .metric {
-    min-height: 118px;
+    min-height: 96px;
+    padding: 12px;
   }
 
   .metric strong {
-    font-size: 3.2rem;
+    margin-top: 8px;
+    font-size: 2.25rem;
+  }
+
+  .metric span,
+  .metric small {
+    font-size: 0.8rem;
+  }
+
+  .controls {
+    gap: 12px;
+    margin-top: 12px;
   }
 
   .hold-controls {
-    grid-template-columns: 1fr 88px 1fr;
+    grid-template-columns: 1fr 82px 1fr;
+    gap: 8px;
+    padding: 10px;
   }
 
   .move-button {
-    min-height: 108px;
+    min-height: 92px;
+  }
+
+  .move-form,
+  .settings {
+    padding: 14px;
   }
 }
 
