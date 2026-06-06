@@ -61,3 +61,9 @@ Height values are encoded as tenths of a millimeter above the desk base height. 
 ## Safety
 
 Watch the desk while moving it. The app sends normal LINAK BLE commands, but you are responsible for clearance, cable slack, load, and anything on or around the desk.
+
+## Attribution
+
+This project is based on protocol details and behavior learned from [rhyst/linak-controller](https://github.com/rhyst/linak-controller).
+
+This repo is not a fork of that Python controller. It is a browser-only Web Bluetooth implementation using the same LINAK/IDASEN BLE GATT services.
