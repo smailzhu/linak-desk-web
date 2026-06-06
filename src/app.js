@@ -56,6 +56,9 @@ class LinakDesk {
   baseHeight = storage.baseHeight;
   moveTimer = null;
   movingToTarget = false;
+  dpgNotificationsStarted = false;
+  heightNotificationsStarted = false;
+  disconnecting = false;
   lastReading = null;
   onDisconnect = () => {};
   onReading = () => {};
@@ -78,14 +81,34 @@ class LinakDesk {
 
     this.device.addEventListener('gattserverdisconnected', () => {
       this.clearMoveTimer();
+      if (this.disconnecting) {
+        this.disconnecting = false;
+        return;
+      }
       this.onDisconnect();
     });
 
-    this.server = await this.device.gatt.connect();
-    await this.loadCharacteristics();
-    await this.startHeightNotifications();
-    await this.initialiseDpg();
-    await this.refreshHeight();
+    this.dpgNotificationsStarted = false;
+    this.heightNotificationsStarted = false;
+    this.disconnecting = false;
+
+    try {
+      this.server = await this.withConnectStep('connecting to GATT server', () => this.device.gatt.connect());
+      await delay(250);
+      await this.loadCharacteristics();
+      await this.startHeightNotifications().catch((error) => {
+        this.onLog(`Live updates unavailable: ${error.message}`);
+      });
+      await this.initialiseDpg();
+      await this.withConnectStep('reading height', () => this.refreshHeight());
+    } catch (error) {
+      if (this.device.gatt.connected) {
+        this.disconnecting = true;
+        this.device.gatt.disconnect();
+      }
+      throw error;
+    }
+
     return this.device;
   }
 
@@ -94,6 +117,7 @@ class LinakDesk {
     this.movingToTarget = false;
     if (this.isConnected()) {
       await this.stop();
+      this.disconnecting = true;
       this.device.gatt.disconnect();
     }
   }
@@ -103,20 +127,39 @@ class LinakDesk {
   }
 
   async loadCharacteristics() {
-    const [control, dpg, output, input] = await Promise.all([
-      this.server.getPrimaryService(UUIDS.controlService),
-      this.server.getPrimaryService(UUIDS.dpgService),
-      this.server.getPrimaryService(UUIDS.referenceOutputService),
-      this.server.getPrimaryService(UUIDS.referenceInputService),
-    ]);
+    const control = await this.withConnectStep('finding control service', () =>
+      this.server.getPrimaryService(UUIDS.controlService)
+    );
+    const controlCommand = await this.withConnectStep('finding control command', () =>
+      control.getCharacteristic(UUIDS.controlCommand)
+    );
 
-    const [controlCommand, dpgCommand, referenceOutputOne, referenceInputOne] =
-      await Promise.all([
-        control.getCharacteristic(UUIDS.controlCommand),
-        dpg.getCharacteristic(UUIDS.dpgCommand),
-        output.getCharacteristic(UUIDS.referenceOutputOne),
-        input.getCharacteristic(UUIDS.referenceInputOne),
-      ]);
+    await delay(100);
+
+    const output = await this.withConnectStep('finding height output service', () =>
+      this.server.getPrimaryService(UUIDS.referenceOutputService)
+    );
+    const referenceOutputOne = await this.withConnectStep('finding height output', () =>
+      output.getCharacteristic(UUIDS.referenceOutputOne)
+    );
+
+    await delay(100);
+
+    const input = await this.withConnectStep('finding height input service', () =>
+      this.server.getPrimaryService(UUIDS.referenceInputService)
+    );
+    const referenceInputOne = await this.withConnectStep('finding height input', () =>
+      input.getCharacteristic(UUIDS.referenceInputOne)
+    );
+
+    await delay(100);
+
+    const dpg = await this.withConnectStep('finding DPG service', () =>
+      this.server.getPrimaryService(UUIDS.dpgService)
+    );
+    const dpgCommand = await this.withConnectStep('finding DPG command', () =>
+      dpg.getCharacteristic(UUIDS.dpgCommand)
+    );
 
     this.chars = {
       controlCommand,
@@ -124,6 +167,15 @@ class LinakDesk {
       referenceOutputOne,
       referenceInputOne,
     };
+  }
+
+  async withConnectStep(step, operation) {
+    this.onLog(`Connecting: ${step}.`);
+    try {
+      return await operation();
+    } catch (error) {
+      throw new Error(`${step} failed: ${error.message || error}`);
+    }
   }
 
   async initialiseDpg() {
@@ -183,7 +235,10 @@ class LinakDesk {
 
       try {
         char.addEventListener('characteristicvaluechanged', handleResponse);
-        await char.startNotifications();
+        if (!this.dpgNotificationsStarted) {
+          await char.startNotifications();
+          this.dpgNotificationsStarted = true;
+        }
 
         if (payload) {
           const buffer = new Uint8Array(3 + payload.byteLength);
@@ -206,10 +261,14 @@ class LinakDesk {
 
   async startHeightNotifications() {
     const char = this.chars.referenceOutputOne;
+    if (this.heightNotificationsStarted) {
+      return;
+    }
     char.addEventListener('characteristicvaluechanged', (event) => {
       this.publishReading(this.decodeHeightSpeed(event.target.value));
     });
     await char.startNotifications();
+    this.heightNotificationsStarted = true;
   }
 
   async refreshHeight() {
@@ -521,7 +580,11 @@ function log(message, type = 'info') {
 }
 
 function formatConnectionError(error) {
-  return String(error?.message || error).replace(/^connection error:\s*/i, '');
+  const message = String(error?.message || error).replace(/^connection error:\s*/i, '');
+  if (/gatt operation failed/i.test(message)) {
+    return `${message}. Put the desk back in pairing mode, make sure no phone app is connected, then retry.`;
+  }
+  return message;
 }
 
 function delay(ms) {
