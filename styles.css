@@ -104,6 +104,20 @@ h2 {
   gap: 12px;
 }
 
+.connection-note {
+  display: grid;
+  gap: 6px;
+  margin-bottom: 18px;
+  border: 1px solid #c7d1c8;
+  border-radius: 8px;
+  padding: 14px 16px;
+  background: #eef4ef;
+}
+
+.connection-note p {
+  color: #405249;
+}
+
 .metric {
   min-height: 150px;
   border: 1px solid #d5d8d2;
@@ -293,6 +307,7 @@ label {
 
   button,
   .input-row input,
+  .connection-note,
   .metric,
   .hold-controls,
   .move-form,
@@ -318,6 +333,7 @@ label {
   }
 
   #deviceName,
+  .connection-note p,
   .metric span,
   .metric small,
   label,

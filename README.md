@@ -28,6 +28,10 @@ Then open:
 http://localhost:8080
 ```
 
+## Connect
+
+Put the desk in Bluetooth pairing mode before connecting. When Chrome, Edge, or the system Bluetooth dialog opens, select the desk and choose Pair or Connect.
+
 ## Deploy
 
 Any static HTTPS host works. Examples:
