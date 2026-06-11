@@ -60,7 +60,9 @@ Height values are encoded as tenths of a millimeter above the desk base height. 
 
 ## Safety
 
-Watch the desk while moving it. The app sends normal LINAK BLE commands, but you are responsible for clearance, cable slack, load, and anything on or around the desk.
+This app controls physical desk movement over Bluetooth. Watch the desk while moving it, keep the area clear, check cable slack, and be ready to stop movement with the app, the physical controls, or power if needed.
+
+Test carefully after any code change or when using a new desk/controller model. The app sends normal LINAK BLE commands, but you are responsible for clearance, load, and anything on or around the desk.
 
 ## Development Note
 
