@@ -294,13 +294,19 @@ label {
 }
 
 .footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
   margin-top: 18px;
+  color: #607068;
+  font-size: 0.9rem;
   text-align: center;
 }
 
 .footer a {
   color: #607068;
-  font-size: 0.9rem;
   text-decoration: none;
 }
 
