@@ -4,6 +4,8 @@ Browser-only controller for LINAK Bluetooth sit/stand desks, including IKEA IDAS
 
 This is a static Web Bluetooth app. It does not require a native app, Python, Node.js, or a local helper process for normal use.
 
+Live site: https://smailzhu.github.io/linak-desk-web/
+
 ## Supported Browsers
 
 Web Bluetooth is required.
@@ -33,6 +35,12 @@ http://localhost:8080
 Put the desk in Bluetooth pairing mode before connecting. When Chrome, Edge, or the system Bluetooth dialog opens, select the desk and choose Pair or Connect.
 
 ## Deploy
+
+This repo is published with GitHub Pages from the `main` branch root:
+
+```text
+https://smailzhu.github.io/linak-desk-web/
+```
 
 Any static HTTPS host works. Examples:
 
